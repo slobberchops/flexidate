@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[[source]]
-url = "https://pypi.python.org/simple"
-verify_ssl = true
-name = "pypi"
 
-[packages]
+class Fuzidate:
 
-[dev-packages]
+    @property
+    def number(self)->int:
+        return self.__number
 
-pytest = "*"
+    def __init__(self, number: int):
+        self.__number = number
+
+
+__all__ = [
+    Fuzidate.__name__,
+]

@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[[source]]
-url = "https://pypi.python.org/simple"
-verify_ssl = true
-name = "pypi"
+import fuzidate
 
-[packages]
 
-[dev-packages]
+class TestAttributes:
 
-pytest = "*"
+    @staticmethod
+    def test_number():
+        number = fuzidate.Fuzidate(19181111).number
+        assert number == 19181111
