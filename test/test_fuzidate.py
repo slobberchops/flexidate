@@ -65,6 +65,28 @@ class TestProperties:
     def test_day_missing():
         assert fuzidate.Fuzidate(19140700).day == 0
 
+    class TestPrecision:
+
+        @staticmethod
+        def test_none():
+            assert (fuzidate.Fuzidate.unknown.precision is
+                    fuzidate.Precision.none)
+
+        @staticmethod
+        def test_year():
+            assert (fuzidate.Fuzidate(19180000).precision is
+                    fuzidate.Precision.year)
+
+        @staticmethod
+        def test_month():
+            assert (fuzidate.Fuzidate(19180700).precision is
+                    fuzidate.Precision.month)
+
+        @staticmethod
+        def test_day():
+            assert (fuzidate.Fuzidate(19180728).precision is
+                    fuzidate.Precision.day)
+
 
 class TestOrder:
 

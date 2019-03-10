@@ -11,9 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import datetime
+import enum
 import functools
 import math
+
+
+class Precision:
+    day = 1
+    month = 2
+    year = 3
+    none = 4
 
 
 @functools.total_ordering
@@ -38,6 +47,17 @@ class Fuzidate:
     @property
     def day(self) -> int:
         return self.__number % 100
+
+    @property
+    def precision(self) -> Precision:
+        if not self.year:
+            return Precision.none
+        elif not self.month:
+            return Precision.year
+        elif not self.day:
+            return Precision.month
+        else:
+            return Precision.day
 
     def __init__(self, number: int):
         self.__number = number
