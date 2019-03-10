@@ -17,21 +17,16 @@ import pytest
 
 import fuzidate
 
-ARMISTICE = datetime.date(1918, 11, 11)
-ARMISTICE_FZD = fuzidate.Fuzidate(19181111)
-
-
-def test_number():
-    number = fuzidate.Fuzidate(19181111).number
-    assert number == 19181111
+OUTBREAK = datetime.date(1914, 7, 28)
+OUTBREAK_FZD = fuzidate.Fuzidate(19140728)
 
 
 def test_date_to_number():
-    assert fuzidate.date_to_number(ARMISTICE) == 19181111
+    assert fuzidate.date_to_number(OUTBREAK) == 19140728
 
 
 def test_from_date():
-    assert fuzidate.Fuzidate.from_date(ARMISTICE).number == 19181111
+    assert fuzidate.Fuzidate.from_date(OUTBREAK).number == 19140728
 
 
 def test_constants():
@@ -40,43 +35,74 @@ def test_constants():
     assert fuzidate.Fuzidate.unknown.number == 0
 
 
+class TestProperties:
+
+    @staticmethod
+    def test_number():
+        assert OUTBREAK_FZD.number == 19140728
+
+    @staticmethod
+    def test_year():
+        assert OUTBREAK_FZD.year == 1914
+
+    @staticmethod
+    def test_year_missing():
+        assert fuzidate.Fuzidate.unknown.year == 0
+
+    @staticmethod
+    def test_month():
+        assert OUTBREAK_FZD.month == 7
+
+    @staticmethod
+    def test_month_missing():
+        assert fuzidate.Fuzidate(19140000).month == 0
+
+    @staticmethod
+    def test_day():
+        assert OUTBREAK_FZD.day == 28
+
+    @staticmethod
+    def test_day_missing():
+        assert fuzidate.Fuzidate(19140700).day == 0
+
+
 class TestOrder:
 
     class TestEq:
 
         @staticmethod
         def test_invalid_eq_type():
-            assert ARMISTICE_FZD != 19181111
-            assert 19181111 != ARMISTICE_FZD
+            assert OUTBREAK_FZD != 19140728
+            assert 19140728 != OUTBREAK_FZD
 
         @staticmethod
         def test_is_same():
-            assert ARMISTICE_FZD == ARMISTICE_FZD
+            assert OUTBREAK_FZD == OUTBREAK_FZD
 
         @staticmethod
         def test_is_eq():
-            assert ARMISTICE_FZD == fuzidate.Fuzidate(19181111)
+            assert OUTBREAK_FZD == fuzidate.Fuzidate(19140728)
 
         @staticmethod
-        @pytest.mark.parametrize('number', [19140728, 19181100, 19180000, 0])
+        @pytest.mark.parametrize('number', [19181111, 19140700, 19140000, 0])
         def test_is_ne(number):
-            assert ARMISTICE_FZD != fuzidate.Fuzidate(number)
+            assert OUTBREAK_FZD != fuzidate.Fuzidate(number)
 
     class TestLt:
 
         @staticmethod
         def test_invalid_lt_type():
             with pytest.raises(TypeError):
-                assert ARMISTICE_FZD < 19181111
+                assert OUTBREAK_FZD < 19140728
             with pytest.raises(TypeError):
-                assert 19181111 < ARMISTICE_FZD
+                assert 19140728 < OUTBREAK_FZD
 
         @staticmethod
-        @pytest.mark.parametrize('number', [19181112, 19181200, 19190000])
+        @pytest.mark.parametrize('number', [19140729, 19140800, 19150000])
         def test_is_lt(number):
-            assert ARMISTICE_FZD < fuzidate.Fuzidate(number)
+            assert OUTBREAK_FZD < fuzidate.Fuzidate(number)
 
         @staticmethod
-        @pytest.mark.parametrize('number', [19181111, 19181100, 19180000])
+        @pytest.mark.parametrize('number', [19140727, 19140700, 19140000])
         def test_is_ge(number):
-            assert ARMISTICE_FZD >= fuzidate.Fuzidate(number)
+            assert OUTBREAK_FZD >= fuzidate.Fuzidate(number)

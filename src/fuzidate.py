@@ -13,9 +13,51 @@
 # limitations under the License.
 import datetime
 import functools
+import math
 
 
-def date_to_number(date: datetime.date):
+@functools.total_ordering
+class Fuzidate:
+
+    max = None  # type: datetime.date
+    min = None  # type: datetime.date
+    unknown = None  # type: datetime.date
+
+    @property
+    def number(self) -> int:
+        return self.__number
+
+    @property
+    def year(self) -> int:
+        return math.floor(self.__number / 10000)
+
+    @property
+    def month(self) -> int:
+        return (math.floor(self.__number / 100)) % 100
+
+    @property
+    def day(self) -> int:
+        return self.__number % 100
+
+    def __init__(self, number: int):
+        self.__number = number
+
+    @classmethod
+    def from_date(cls, date: datetime.date) -> 'Fuzidate':
+        return cls(date_to_number(date))
+
+    def __eq__(self, other) -> bool:
+        if type(self) is not type(other):
+            return NotImplemented
+        return self.__number == other.__number
+
+    def __lt__(self, other) -> bool:
+        if type(self) is not type(other):
+            return NotImplemented
+        return self.__number < other.__number
+
+
+def date_to_number(date: datetime.date) -> Fuzidate:
     """
     Convert date to fuzidate number representation.
 
@@ -27,35 +69,6 @@ def date_to_number(date: datetime.date):
         Nov 11th 1918 is represented as 19181111.
     """
     return date.day + date.month * 100 + date.year * 10000
-
-
-@functools.total_ordering
-class Fuzidate:
-
-    max = None  # type: datetime.date
-    min = None  # type: datetime.date
-    unknown = None  # type: datetime.date
-
-    @property
-    def number(self)->int:
-        return self.__number
-
-    def __init__(self, number: int):
-        self.__number = number
-
-    @classmethod
-    def from_date(cls, date: datetime.date):
-        return cls(date_to_number(date))
-
-    def __eq__(self, other):
-        if type(self) is not type(other):
-            return NotImplemented
-        return self.__number == other.__number
-
-    def __lt__(self, other):
-        if type(self) is not type(other):
-            return NotImplemented
-        return self.__number < other.__number
 
 
 Fuzidate.max = Fuzidate.from_date(datetime.date.max)
