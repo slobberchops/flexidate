@@ -13,6 +13,8 @@
 # limitations under the License.
 import datetime
 
+import pytest
+
 import fuzidate
 
 ARMISTICE = datetime.date(1918, 11, 11)
@@ -30,3 +32,45 @@ def test_date_to_number():
 
 def test_from_date():
     assert fuzidate.Fuzidate.from_date(ARMISTICE).number == 19181111
+
+
+class TestOrder:
+
+    class TestEq:
+
+        @staticmethod
+        def test_invalid_eq_type():
+            assert ARMISTICE_FZD != 19181111
+            assert 19181111 != ARMISTICE_FZD
+
+        @staticmethod
+        def test_is_same():
+            assert ARMISTICE_FZD == ARMISTICE_FZD
+
+        @staticmethod
+        def test_is_eq():
+            assert ARMISTICE_FZD == fuzidate.Fuzidate(19181111)
+
+        @staticmethod
+        @pytest.mark.parametrize('number', [19140728, 19181100, 19180000, 0])
+        def test_is_ne(number):
+            assert ARMISTICE_FZD != fuzidate.Fuzidate(number)
+
+    class TestLt:
+
+        @staticmethod
+        def test_invalid_lt_type():
+            with pytest.raises(TypeError):
+                assert ARMISTICE_FZD < 19181111
+            with pytest.raises(TypeError):
+                assert 19181111 < ARMISTICE_FZD
+
+        @staticmethod
+        @pytest.mark.parametrize('number', [19181112, 19181200, 19190000])
+        def test_is_lt(number):
+            assert ARMISTICE_FZD < fuzidate.Fuzidate(number)
+
+        @staticmethod
+        @pytest.mark.parametrize('number', [19181111, 19181100, 19180000])
+        def test_is_ge(number):
+            assert ARMISTICE_FZD >= fuzidate.Fuzidate(number)

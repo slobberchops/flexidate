@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import datetime
+import functools
 
 
 def date_to_number(date: datetime.date):
@@ -28,6 +29,7 @@ def date_to_number(date: datetime.date):
     return date.day + date.month * 100 + date.year * 10000
 
 
+@functools.total_ordering
 class Fuzidate:
 
     @property
@@ -40,6 +42,16 @@ class Fuzidate:
     @classmethod
     def from_date(cls, date: datetime.date):
         return cls(date_to_number(date))
+
+    def __eq__(self, other):
+        if type(self) is not type(other):
+            return NotImplemented
+        return self.__number == other.__number
+
+    def __lt__(self, other):
+        if type(self) is not type(other):
+            return NotImplemented
+        return self.__number < other.__number
 
 
 Fuzidate.max = Fuzidate.from_date(datetime.date.max)
