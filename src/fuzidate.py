@@ -32,6 +32,10 @@ def date_to_number(date: datetime.date):
 @functools.total_ordering
 class Fuzidate:
 
+    max = None  # type: datetime.date
+    min = None  # type: datetime.date
+    unknown = None  # type: datetime.date
+
     @property
     def number(self)->int:
         return self.__number
@@ -55,7 +59,8 @@ class Fuzidate:
 
 
 Fuzidate.max = Fuzidate.from_date(datetime.date.max)
-Fuzidate.min = Fuzidate.from_date(datetime.date.min)
+Fuzidate.min = Fuzidate(datetime.date.min.year * 10000)
+Fuzidate.unknown = Fuzidate(0)
 
 
 __all__ = [

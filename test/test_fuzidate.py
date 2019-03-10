@@ -34,6 +34,12 @@ def test_from_date():
     assert fuzidate.Fuzidate.from_date(ARMISTICE).number == 19181111
 
 
+def test_constants():
+    assert fuzidate.Fuzidate.max.number == 99991231
+    assert fuzidate.Fuzidate.min.number == 10000
+    assert fuzidate.Fuzidate.unknown.number == 0
+
+
 class TestOrder:
 
     class TestEq:
