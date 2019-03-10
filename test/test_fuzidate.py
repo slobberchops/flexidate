@@ -88,6 +88,28 @@ class TestProperties:
                     fuzidate.Precision.day)
 
 
+class TestToString:
+
+    def test_repr(self):
+        assert repr(fuzidate.Fuzidate.unknown) == 'Fuzidate(0)'
+        assert repr(OUTBREAK_FZD) == 'Fuzidate(19140728)'
+
+    class TestStr:
+
+        def test_unknown(self):
+            assert str(fuzidate.Fuzidate.unknown) == 'unknown'
+
+        def test_year(self):
+            assert str(fuzidate.Fuzidate(19140000)) == '1914'
+            assert str(fuzidate.Fuzidate(100000)) == '10'
+
+        def test_month(self):
+            assert str(fuzidate.Fuzidate(19140700)) == '1914-07'
+
+        def test_day(self):
+            assert str(fuzidate.Fuzidate(19140701)) == '1914-07-01'
+
+
 class TestOrder:
 
     class TestEq:

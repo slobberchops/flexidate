@@ -76,6 +76,20 @@ class Fuzidate:
             return NotImplemented
         return self.__number < other.__number
 
+    def __str__(self):
+        precision = self.precision
+        if precision is Precision.none:
+            return 'unknown'
+        elif precision is Precision.year:
+            return str(self.year)
+        elif precision is Precision.month:
+            return '{}-{:02d}'.format(self.year, self.month)
+        else:
+            return '{}-{:02d}-{:02d}'.format(self.year, self.month, self.day)
+
+    def __repr__(self):
+        return '{}({})'.format(type(self).__name__, self.__number)
+
 
 def date_to_number(date: datetime.date) -> Fuzidate:
     """
@@ -99,4 +113,5 @@ Fuzidate.unknown = Fuzidate(0)
 __all__ = [
     date_to_number.__name__,
     Fuzidate.__name__,
+    Precision.__name__,
 ]
