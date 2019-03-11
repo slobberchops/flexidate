@@ -132,40 +132,53 @@ class TestProperties:
             with pytest.raises(fzd.InvalidFuzidateError):
                 getattr(invalid, prop)
 
+        @staticmethod
+        def test_range():
+            assert OUTBREAK_FZD.range == (OUTBREAK_FZD.high, OUTBREAK_FZD.low)
+
         class TestHigh:
 
-            def test_unknown(self):
+            @staticmethod
+            def test_unknown():
                 assert fzd.Fuzidate.unknown.high == datetime.date.max
 
-            def test_year(self):
+            @staticmethod
+            def test_year():
                 year = fzd.Fuzidate.compose(1914)
                 assert year.high == datetime.date(1914, 12, 31)
 
-            def test_month(self):
+            @staticmethod
+            def test_month():
                 month = fzd.Fuzidate.compose(1914, 2)
                 assert month.high == datetime.date(1914, 2, 28)
 
-            def test_month_leap_year(self):
+            @staticmethod
+            def test_month_leap_year():
                 month = fzd.Fuzidate.compose(1916, 2)
                 assert month.high == datetime.date(1916, 2, 29)
 
-            def test_day(self):
+            @staticmethod
+            def test_day():
                 assert OUTBREAK_FZD.high == datetime.date(1914, 7, 28)
 
         class TestLow:
 
-            def test_unknown(self):
+            @staticmethod
+            def test_unknown():
                 assert fzd.Fuzidate.unknown.low == datetime.date.min
 
-            def test_year(self):
+            @staticmethod
+            def test_year():
                 year = fzd.Fuzidate.compose(1914)
                 assert year.low == datetime.date(1914, 1, 1)
 
-            def test_month(self):
+            @staticmethod
+            def test_month():
                 month = fzd.Fuzidate.compose(1914, 7)
                 assert month.low == datetime.date(1914, 7, 1)
 
-            def test_day(self):
+            @staticmethod
+            def test_day():
                 assert OUTBREAK_FZD.low == datetime.date(1914, 7, 28)
 
 
