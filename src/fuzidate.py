@@ -146,7 +146,6 @@ class Fuzidate:
         # Check that values are in correct range.
         year = self.year
         if day:
-            # Check day by trying to construct a date object.
             if day > calendar.monthrange(year, month)[1]:
                 raise InvalidFuzidateError('Invalid day: {}'.format(day))
 
@@ -235,5 +234,6 @@ Fuzidate.unknown = Fuzidate(0)
 __all__ = [
     date_to_number.__name__,
     Fuzidate.__name__,
+    InvalidFuzidateError.__name__,
     Precision.__name__,
 ]
