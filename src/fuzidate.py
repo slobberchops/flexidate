@@ -25,9 +25,6 @@ class Precision(enum.Enum):
     month = 3
     day = 4
 
-    # def __eq__(self, other):
-    #     return self is other
-
     def __lt__(self, other):
         if not isinstance(other, Precision):
             return NotImplemented
