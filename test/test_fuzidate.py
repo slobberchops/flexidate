@@ -123,6 +123,51 @@ class TestProperties:
         def test_false():
             assert not fzd.Fuzidate(1).is_valid
 
+    class TestRanges:
+
+        @staticmethod
+        @pytest.mark.parametrize('prop', ['high', 'low', 'range'])
+        def test_invalid(prop):
+            invalid = fzd.Fuzidate(1)
+            with pytest.raises(fzd.InvalidFuzidateError):
+                getattr(invalid, prop)
+
+        class TestHigh:
+
+            def test_unknown(self):
+                assert fzd.Fuzidate.unknown.high == datetime.date.max
+
+            def test_year(self):
+                year = fzd.Fuzidate.compose(1914)
+                assert year.high == datetime.date(1914, 12, 31)
+
+            def test_month(self):
+                month = fzd.Fuzidate.compose(1914, 2)
+                assert month.high == datetime.date(1914, 2, 28)
+
+            def test_month_leap_year(self):
+                month = fzd.Fuzidate.compose(1916, 2)
+                assert month.high == datetime.date(1916, 2, 29)
+
+            def test_day(self):
+                assert OUTBREAK_FZD.high == datetime.date(1914, 7, 28)
+
+        class TestLow:
+
+            def test_unknown(self):
+                assert fzd.Fuzidate.unknown.low == datetime.date.min
+
+            def test_year(self):
+                year = fzd.Fuzidate.compose(1914)
+                assert year.low == datetime.date(1914, 1, 1)
+
+            def test_month(self):
+                month = fzd.Fuzidate.compose(1914, 7)
+                assert month.low == datetime.date(1914, 7, 1)
+
+            def test_day(self):
+                assert OUTBREAK_FZD.low == datetime.date(1914, 7, 28)
+
 
 class TestToString:
 

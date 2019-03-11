@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import calendar
 import datetime
 import enum
 import functools
 import math
+import typing
 
 
 class InvalidFuzidateError(Exception):
@@ -38,9 +40,12 @@ class Precision(enum.Enum):
 @functools.total_ordering
 class Fuzidate:
 
-    max = None  # type: datetime.date
-    min = None  # type: datetime.date
-    unknown = None  # type: datetime.date
+    max = None  # type: ClassVar[datetime.date]
+    min = None  # type: ClassVar[datetime.date]
+    unknown = None  # type: ClassVar[datetime.date]
+    __high = None
+    __low = None
+    __validated = False
 
     @property
     def number(self) -> int:
@@ -78,11 +83,53 @@ class Fuzidate:
         else:
             return Precision.day
 
+    @property
+    def high(self) -> datetime.date:
+        if not self.__high:
+            self.check_valid()
+
+            precision = self.precision
+
+            if precision < Precision.year:
+                year = datetime.date.max.year
+            else:
+                year = self.year
+
+            if precision < Precision.month:
+                month = 12
+            else:
+                month = self.month
+
+            if precision < Precision.day:
+                day = calendar.monthrange(year, month)[1]
+            else:
+                day = self.day
+
+            self.__high = datetime.date(year, month, day)
+
+        return self.__high
+
+    @property
+    def low(self) -> datetime.date:
+        if not self.__low:
+            self.check_valid()
+            self.__low = datetime.date(self.year or datetime.date.min.year,
+                                       self.month or 1,
+                                       self.day or 1)
+        return self.__low
+
+    @property
+    def range(self) -> typing.Tuple[datetime.date, datetime.date]:
+        return self.low, self.high
+
     def __init__(self, number: int):
         self.__number = number
 
     def check_valid(self):
+        if self.__validated:
+            return
         if not self.__number:
+            self.__validated = True
             return
 
         day = self.day
@@ -100,17 +147,17 @@ class Fuzidate:
         year = self.year
         if day:
             # Check day by trying to construct a date object.
-            try:
-                datetime.date(year, month, day)
-            except ValueError:
+            if day > calendar.monthrange(year, month)[1]:
                 raise InvalidFuzidateError('Invalid day: {}'.format(day))
 
         if month:
-            if not (1 <= month <= 12):
+            if month > 12:
                 raise InvalidFuzidateError('Invalid month: {}'.format(month))
 
         if not (self.min.year <= year <= self.max.year):
             raise InvalidFuzidateError('Invalid year: {}'.format(year))
+
+        self.__validated = True
 
     def using(self, precision: Precision) -> 'Fuzidate':
         self.check_valid()
