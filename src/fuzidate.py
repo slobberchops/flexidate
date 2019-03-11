@@ -62,6 +62,19 @@ class Fuzidate:
     def __init__(self, number: int):
         self.__number = number
 
+    def using(self, precision: Precision) -> 'Fuzidate':
+        if precision is Precision.none:
+            return self.unknown
+        elif precision is Precision.year:
+            return self.compose(self.year or self.min.year)
+        elif precision is Precision.month:
+            return self.compose(self.year or self.min.year,
+                                self.month or 1)
+        else:
+            return self.compose(self.year or self.min.year,
+                                self.month or 1,
+                                self.day or 1)
+
     @classmethod
     def from_date(cls, date: datetime.date) -> 'Fuzidate':
         return cls(date_to_number(date))

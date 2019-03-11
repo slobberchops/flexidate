@@ -15,24 +15,24 @@ import datetime
 
 import pytest
 
-import fuzidate
+import fuzidate as fzd
 
 OUTBREAK = datetime.date(1914, 7, 28)
-OUTBREAK_FZD = fuzidate.Fuzidate(19140728)
+OUTBREAK_FZD = fzd.Fuzidate(19140728)
 
 
 def test_date_to_number():
-    assert fuzidate.date_to_number(OUTBREAK) == 19140728
+    assert fzd.date_to_number(OUTBREAK) == 19140728
 
 
 def test_from_date():
-    assert fuzidate.Fuzidate.from_date(OUTBREAK).number == 19140728
+    assert fzd.Fuzidate.from_date(OUTBREAK).number == 19140728
 
 
 def test_constants():
-    assert fuzidate.Fuzidate.max.number == 99991231
-    assert fuzidate.Fuzidate.min.number == 10000
-    assert fuzidate.Fuzidate.unknown.number == 0
+    assert fzd.Fuzidate.max.number == 99991231
+    assert fzd.Fuzidate.min.number == 10000
+    assert fzd.Fuzidate.unknown.number == 0
 
 
 class TestProperties:
@@ -47,7 +47,7 @@ class TestProperties:
 
     @staticmethod
     def test_year_missing():
-        assert fuzidate.Fuzidate.unknown.year == 0
+        assert fzd.Fuzidate.unknown.year == 0
 
     @staticmethod
     def test_month():
@@ -55,7 +55,7 @@ class TestProperties:
 
     @staticmethod
     def test_month_missing():
-        assert fuzidate.Fuzidate(19140000).month == 0
+        assert fzd.Fuzidate(19140000).month == 0
 
     @staticmethod
     def test_day():
@@ -63,51 +63,47 @@ class TestProperties:
 
     @staticmethod
     def test_day_missing():
-        assert fuzidate.Fuzidate(19140700).day == 0
+        assert fzd.Fuzidate(19140700).day == 0
 
     class TestPrecision:
 
         @staticmethod
         def test_none():
-            assert (fuzidate.Fuzidate.unknown.precision is
-                    fuzidate.Precision.none)
+            assert fzd.Fuzidate.unknown.precision is fzd.Precision.none
 
         @staticmethod
         def test_year():
-            assert (fuzidate.Fuzidate(19180000).precision is
-                    fuzidate.Precision.year)
+            assert fzd.Fuzidate(19180000).precision is fzd.Precision.year
 
         @staticmethod
         def test_month():
-            assert (fuzidate.Fuzidate(19180700).precision is
-                    fuzidate.Precision.month)
+            assert fzd.Fuzidate(19180700).precision is fzd.Precision.month
 
         @staticmethod
         def test_day():
-            assert (fuzidate.Fuzidate(19180728).precision is
-                    fuzidate.Precision.day)
+            assert fzd.Fuzidate(19180728).precision is fzd.Precision.day
 
 
 class TestToString:
 
     def test_repr(self):
-        assert repr(fuzidate.Fuzidate.unknown) == 'Fuzidate(0)'
+        assert repr(fzd.Fuzidate.unknown) == 'Fuzidate(0)'
         assert repr(OUTBREAK_FZD) == 'Fuzidate(19140728)'
 
     class TestStr:
 
         def test_unknown(self):
-            assert str(fuzidate.Fuzidate.unknown) == 'unknown'
+            assert str(fzd.Fuzidate.unknown) == 'unknown'
 
         def test_year(self):
-            assert str(fuzidate.Fuzidate(19140000)) == '1914'
-            assert str(fuzidate.Fuzidate(100000)) == '10'
+            assert str(fzd.Fuzidate(19140000)) == '1914'
+            assert str(fzd.Fuzidate(100000)) == '10'
 
         def test_month(self):
-            assert str(fuzidate.Fuzidate(19140700)) == '1914-07'
+            assert str(fzd.Fuzidate(19140700)) == '1914-07'
 
         def test_day(self):
-            assert str(fuzidate.Fuzidate(19140701)) == '1914-07-01'
+            assert str(fzd.Fuzidate(19140701)) == '1914-07-01'
 
 
 class TestOrder:
@@ -125,12 +121,12 @@ class TestOrder:
 
         @staticmethod
         def test_is_eq():
-            assert OUTBREAK_FZD == fuzidate.Fuzidate(19140728)
+            assert OUTBREAK_FZD == fzd.Fuzidate(19140728)
 
         @staticmethod
         @pytest.mark.parametrize('number', [19181111, 19140700, 19140000, 0])
         def test_is_ne(number):
-            assert OUTBREAK_FZD != fuzidate.Fuzidate(number)
+            assert OUTBREAK_FZD != fzd.Fuzidate(number)
 
     class TestLt:
 
@@ -144,26 +140,69 @@ class TestOrder:
         @staticmethod
         @pytest.mark.parametrize('number', [19140729, 19140800, 19150000])
         def test_is_lt(number):
-            assert OUTBREAK_FZD < fuzidate.Fuzidate(number)
+            assert OUTBREAK_FZD < fzd.Fuzidate(number)
 
         @staticmethod
         @pytest.mark.parametrize('number', [19140727, 19140700, 19140000])
         def test_is_ge(number):
-            assert OUTBREAK_FZD >= fuzidate.Fuzidate(number)
+            assert OUTBREAK_FZD >= fzd.Fuzidate(number)
 
 
 class TestCompose:
 
-    def test_default(self):
-        assert fuzidate.Fuzidate.compose() == fuzidate.Fuzidate.unknown
+    @staticmethod
+    def test_default():
+        assert fzd.Fuzidate.compose() == fzd.Fuzidate.unknown
 
-    def test_year(self):
-        assert fuzidate.Fuzidate.compose(1914) == fuzidate.Fuzidate(19140000)
+    @staticmethod
+    def test_year():
+        assert fzd.Fuzidate.compose(1914) == fzd.Fuzidate(19140000)
 
-    def test_month(self):
-        assert (fuzidate.Fuzidate.compose(1914, 7) ==
-                fuzidate.Fuzidate(19140700))
+    @staticmethod
+    def test_month():
+        assert fzd.Fuzidate.compose(1914, 7) == fzd.Fuzidate(19140700)
 
-    def test_day(self):
-        assert (fuzidate.Fuzidate.compose(1914, 7, 28) ==
-                fuzidate.Fuzidate(19140728))
+    @staticmethod
+    def test_day():
+        assert fzd.Fuzidate.compose(1914, 7, 28) == fzd.Fuzidate(19140728)
+
+
+class TestUsingPrecision:
+
+    @staticmethod
+    def test_none():
+        unknown = OUTBREAK_FZD.using(fzd.Precision.none)
+        assert unknown is fzd.Fuzidate.unknown
+
+    @staticmethod
+    def test_less_precise_year():
+        year = OUTBREAK_FZD.using(fzd.Precision.year)
+        assert year == fzd.Fuzidate.compose(1914)
+
+    @staticmethod
+    def test_less_precise_month():
+        month = OUTBREAK_FZD.using(fzd.Precision.month)
+        assert month == fzd.Fuzidate.compose(1914, 7)
+
+    @staticmethod
+    def test_less_precise_day():
+        day = OUTBREAK_FZD.using(fzd.Precision.day)
+        assert day == fzd.Fuzidate.compose(1914, 7, 28)
+
+    @staticmethod
+    def test_more_precise_year():
+        unknown = fzd.Fuzidate.unknown
+        year = unknown.using(fzd.Precision.year)
+        assert year == fzd.Fuzidate.compose(1)
+
+    @staticmethod
+    def test_more_precise_month():
+        unknown = fzd.Fuzidate.unknown
+        month = unknown.using(fzd.Precision.month)
+        assert month == fzd.Fuzidate.compose(1, 1)
+
+    @staticmethod
+    def test_more_precise_day():
+        unknown = fzd.Fuzidate.unknown
+        day = unknown.using(fzd.Precision.day)
+        assert day == fzd.Fuzidate.compose(1, 1, 1)
