@@ -18,7 +18,7 @@ import functools
 import math
 
 
-class Precision:
+class Precision(enum.Enum):
     day = 1
     month = 2
     year = 3
@@ -65,6 +65,10 @@ class Fuzidate:
     @classmethod
     def from_date(cls, date: datetime.date) -> 'Fuzidate':
         return cls(date_to_number(date))
+
+    @classmethod
+    def compose(cls, year=0, month=0, day=0):
+        return cls(day + (month * 100) + (year * 10000))
 
     def __eq__(self, other) -> bool:
         if type(self) is not type(other):

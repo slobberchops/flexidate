@@ -150,3 +150,20 @@ class TestOrder:
         @pytest.mark.parametrize('number', [19140727, 19140700, 19140000])
         def test_is_ge(number):
             assert OUTBREAK_FZD >= fuzidate.Fuzidate(number)
+
+
+class TestCompose:
+
+    def test_default(self):
+        assert fuzidate.Fuzidate.compose() == fuzidate.Fuzidate.unknown
+
+    def test_year(self):
+        assert fuzidate.Fuzidate.compose(1914) == fuzidate.Fuzidate(19140000)
+
+    def test_month(self):
+        assert (fuzidate.Fuzidate.compose(1914, 7) ==
+                fuzidate.Fuzidate(19140700))
+
+    def test_day(self):
+        assert (fuzidate.Fuzidate.compose(1914, 7, 28) ==
+                fuzidate.Fuzidate(19140728))
