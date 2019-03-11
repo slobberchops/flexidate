@@ -206,6 +206,21 @@ class TestCompose:
     def test_day():
         assert fzd.Fuzidate.compose(1914, 7, 28) == fzd.Fuzidate(19140728)
 
+    @staticmethod
+    def test_year_lt_0():
+        with pytest.raises(ValueError, match='Year may not be < 0'):
+            fzd.Fuzidate.compose(-1, 7, 28)
+
+    @staticmethod
+    def test_month_lt_0():
+        with pytest.raises(ValueError, match='Month may not be < 0'):
+            fzd.Fuzidate.compose(1914, -1, 28)
+
+    @staticmethod
+    def test_day_lt_0():
+        with pytest.raises(ValueError, match='Day may not be < 0'):
+            fzd.Fuzidate.compose(1914, 7, -1)
+
 
 class TestCheckValid:
 
@@ -222,18 +237,32 @@ class TestCheckValid:
             fzd.Fuzidate(100).check_valid()
 
     @staticmethod
-    def test_too_low():
-        too_low = fzd.Fuzidate.compose(-1, 12, 31)
+    def test_invalid_day():
+        invalid = fzd.Fuzidate.compose(1914, 2, 29)
         with pytest.raises(fzd.InvalidFuzidateError,
-                           match='Fuzidate too low'):
-            too_low.check_valid()
+                           match='Invalid day: 29'):
+            invalid.check_valid()
 
     @staticmethod
-    def test_too_high():
-        too_low = fzd.Fuzidate.compose(fzd.Fuzidate.max.year + 1, 1, 1)
+    def test_invalid_day_leap_year():
+        invalid = fzd.Fuzidate.compose(1916, 2, 30)
         with pytest.raises(fzd.InvalidFuzidateError,
-                           match='Fuzidate too high'):
-            too_low.check_valid()
+                           match='Invalid day: 30'):
+            invalid.check_valid()
+
+    @staticmethod
+    def test_invalid_month():
+        invalid = fzd.Fuzidate.compose(1914, 13)
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Invalid month: 13'):
+            invalid.check_valid()
+
+    @staticmethod
+    def test_invalid_year():
+        invalid = fzd.Fuzidate.compose(datetime.date.max.year + 1)
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Invalid year: 10000'):
+            invalid.check_valid()
 
 
 class TestUsingPrecision:

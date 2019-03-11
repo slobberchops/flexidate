@@ -84,18 +84,33 @@ class Fuzidate:
     def check_valid(self):
         if not self.__number:
             return
+
+        day = self.day
+        # Check basic number construction.
         if self.precision < Precision.day:
-            if self.day:
+            if day:
                 raise InvalidFuzidateError('Day must not be set')
+
+        month = self.month
         if self.precision < Precision.month:
-            if self.month:
+            if month:
                 raise InvalidFuzidateError('Month must not be set')
 
-        if self < self.min:
-            raise InvalidFuzidateError('Fuzidate too low')
+        # Check that values are in correct range.
+        year = self.year
+        if day:
+            # Check day by trying to construct a date object.
+            try:
+                datetime.date(year, month, day)
+            except ValueError:
+                raise InvalidFuzidateError('Invalid day: {}'.format(day))
 
-        if self > self.max:
-            raise InvalidFuzidateError('Fuzidate too high')
+        if month:
+            if not (1 <= month <= 12):
+                raise InvalidFuzidateError('Invalid month: {}'.format(month))
+
+        if not (self.min.year <= year <= self.max.year):
+            raise InvalidFuzidateError('Invalid year: {}'.format(year))
 
     def using(self, precision: Precision) -> 'Fuzidate':
         self.check_valid()
@@ -118,6 +133,12 @@ class Fuzidate:
 
     @classmethod
     def compose(cls, year=0, month=0, day=0):
+        if year < 0:
+            raise ValueError('Year may not be < 0')
+        if month < 0:
+            raise ValueError('Month may not be < 0')
+        if day < 0:
+            raise ValueError('Day may not be < 0')
         return cls(day + (month * 100) + (year * 10000))
 
     def __eq__(self, other) -> bool:
