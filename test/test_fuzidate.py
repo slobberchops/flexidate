@@ -35,6 +35,36 @@ def test_constants():
     assert fzd.Fuzidate.unknown.number == 0
 
 
+class TestPrecisionOrder:
+
+    @staticmethod
+    @pytest.mark.parametrize('prec', [sorted(fzd.Precision)])
+    def test_eq(prec):
+        assert prec == prec
+
+    @staticmethod
+    @pytest.mark.parametrize('index',
+                             list(range(len(fzd.Precision))))
+    def test_not_eq(index):
+        precisions = list(fzd.Precision)
+        l = precisions[index]
+        r = precisions[(index + 1) % len(fzd.Precision)]
+        assert l != r
+
+    @staticmethod
+    @pytest.mark.parametrize('index',
+                             list(range(len(fzd.Precision) - 1)))
+    def test_lt(index):
+        precisions = list(fzd.Precision)
+        l = precisions[index]
+        r = precisions[index + 1]
+        assert l < r
+
+    def test_lt_invalid(self):
+        with pytest.raises(TypeError):
+            fzd.Precision.day < 1
+
+
 class TestProperties:
 
     @staticmethod
@@ -106,7 +136,7 @@ class TestToString:
             assert str(fzd.Fuzidate(19140701)) == '1914-07-01'
 
 
-class TestOrder:
+class TestFuzidateOrder:
 
     class TestEq:
 

@@ -18,11 +18,20 @@ import functools
 import math
 
 
+@functools.total_ordering
 class Precision(enum.Enum):
-    day = 1
-    month = 2
-    year = 3
-    none = 4
+    none = 1
+    year = 2
+    month = 3
+    day = 4
+
+    # def __eq__(self, other):
+    #     return self is other
+
+    def __lt__(self, other):
+        if not isinstance(other, Precision):
+            return NotImplemented
+        return self.value < other.value
 
 
 @functools.total_ordering
