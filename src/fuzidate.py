@@ -18,6 +18,10 @@ import functools
 import math
 
 
+class InvalidFuzidateError(Exception):
+    """Raised when fuzidate is invalid."""
+
+
 @functools.total_ordering
 class Precision(enum.Enum):
     none = 1
@@ -55,6 +59,15 @@ class Fuzidate:
         return self.__number % 100
 
     @property
+    def is_valid(self) -> bool:
+        try:
+            self.check_valid()
+        except InvalidFuzidateError:
+            return False
+        else:
+            return True
+
+    @property
     def precision(self) -> Precision:
         if not self.year:
             return Precision.none
@@ -68,7 +81,25 @@ class Fuzidate:
     def __init__(self, number: int):
         self.__number = number
 
+    def check_valid(self):
+        if not self.__number:
+            return
+        if self.precision < Precision.day:
+            if self.day:
+                raise InvalidFuzidateError('Day must not be set')
+        if self.precision < Precision.month:
+            if self.month:
+                raise InvalidFuzidateError('Month must not be set')
+
+        if self < self.min:
+            raise InvalidFuzidateError('Fuzidate too low')
+
+        if self > self.max:
+            raise InvalidFuzidateError('Fuzidate too high')
+
     def using(self, precision: Precision) -> 'Fuzidate':
+        self.check_valid()
+
         if precision is Precision.none:
             return self.unknown
         elif precision is Precision.year:

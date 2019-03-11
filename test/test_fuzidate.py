@@ -113,6 +113,16 @@ class TestProperties:
         def test_day():
             assert fzd.Fuzidate(19180728).precision is fzd.Precision.day
 
+    class TestIsValid:
+
+        @staticmethod
+        def test_true():
+            assert OUTBREAK_FZD.is_valid
+
+        @staticmethod
+        def test_false():
+            assert not fzd.Fuzidate(1).is_valid
+
 
 class TestToString:
 
@@ -197,7 +207,42 @@ class TestCompose:
         assert fzd.Fuzidate.compose(1914, 7, 28) == fzd.Fuzidate(19140728)
 
 
+class TestCheckValid:
+
+    @staticmethod
+    def test_day_set():
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Day must not be set'):
+            fzd.Fuzidate(19180001).check_valid()
+
+    @staticmethod
+    def test_month_set():
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Month must not be set'):
+            fzd.Fuzidate(100).check_valid()
+
+    @staticmethod
+    def test_too_low():
+        too_low = fzd.Fuzidate.compose(-1, 12, 31)
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Fuzidate too low'):
+            too_low.check_valid()
+
+    @staticmethod
+    def test_too_high():
+        too_low = fzd.Fuzidate.compose(fzd.Fuzidate.max.year + 1, 1, 1)
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Fuzidate too high'):
+            too_low.check_valid()
+
+
 class TestUsingPrecision:
+
+    @staticmethod
+    def test_invalid_date():
+        invalid = fzd.Fuzidate(1)
+        with pytest.raises(fzd.InvalidFuzidateError):
+            invalid.using(fzd.Precision.month)
 
     @staticmethod
     def test_none():
