@@ -272,6 +272,9 @@ class Fuzidate:
     def __repr__(self):
         return '{}({})'.format(type(self).__name__, self.__number)
 
+    def __hash__(self):
+        return hash((self.__number, self.__offset))
+
 
 Fuzidate.max = Fuzidate.from_date(datetime.date.max)
 Fuzidate.min = Fuzidate(datetime.date.min.year * 10000)

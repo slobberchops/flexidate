@@ -31,6 +31,10 @@ def test_constants():
     assert fzd.Fuzidate.unknown.number == 0
 
 
+def test_in_dict():
+    {OUTBREAK_FZD: 'outbreak'}
+
+
 class TestPrecisionOrder:
 
     @staticmethod
