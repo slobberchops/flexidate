@@ -89,28 +89,7 @@ class Fuzidate:
 
     @property
     def high(self) -> datetime.date:
-        if not self.__high:
-            self.check_valid()
-
-            precision = self.precision
-
-            if precision < Precision.year:
-                year = datetime.date.max.year
-            else:
-                year = self.year
-
-            if precision < Precision.month:
-                month = 12
-            else:
-                month = self.month
-
-            if precision < Precision.day:
-                day = calendar.monthrange(year, month)[1]
-            else:
-                day = self.day
-
-            self.__high = datetime.date(year, month, day)
-
+        self.check_valid()
         return self.__high
 
     @property
@@ -130,31 +109,66 @@ class Fuzidate:
         self.__number = number
         self.__offset = offset
 
+    @staticmethod
+    def __calc_high(precision, year, month, day, offset):
+        if precision < Precision.month:
+            month = 12
+
+        if precision < Precision.day:
+            day = calendar.monthrange(year, month)[1]
+
+        if offset:
+            if precision is Precision.year:
+                year += offset
+            elif precision is Precision.month:
+                high_months = month + offset
+                year += int((high_months - 1) / 12)
+                month = high_months % 12
+                if not month:
+                    month = 12
+                try:
+                    day = calendar.monthrange(year, month)[1]
+                except ValueError:
+                    raise InvalidFuzidateError('Offset out of range') from None
+            elif precision is Precision.day:
+                delta = datetime.timedelta(seconds=offset * (60 * 60 * 24))
+                d = datetime.date(year, month, day)
+                try:
+                    high = d + delta
+                except OverflowError:
+                    raise InvalidFuzidateError('Offset out of range') from None
+                else:
+                    return high
+
+        try:
+            return datetime.date(year, month, day)
+        except ValueError:
+            raise InvalidFuzidateError('Offset out of range') from None
+
     def check_valid(self):
         if self.__validated:
             return
 
+        offset = self.__offset
         if not self.__number:
-            if self.__offset:
+            if offset:
                 raise InvalidFuzidateError(
                     'Unknown fuzidate may not have offset')
+
+            self.__high = datetime.date.max
             self.__validated = True
             return
 
-        if self.__offset < 0:
-            raise InvalidFuzidateError('Offset must not be negative')
-
-        if self.__offset:
-            raise NotImplementedError
-
         day = self.day
+        precision = self.precision
+
         # Check basic number construction.
-        if self.precision < Precision.day:
+        if precision < Precision.day:
             if day:
                 raise InvalidFuzidateError('Day must not be set')
 
         month = self.month
-        if self.precision < Precision.month:
+        if precision < Precision.month:
             if month:
                 raise InvalidFuzidateError('Month must not be set')
 
@@ -171,9 +185,16 @@ class Fuzidate:
         if not (self.min.year <= year <= self.max.year):
             raise InvalidFuzidateError('Invalid year: {}'.format(year))
 
+        if offset < 0:
+            raise InvalidFuzidateError('Offset must not be negative')
+
+        self.__high = self.__calc_high(precision, year, month, day, offset)
+
         self.__validated = True
 
     def using(self, precision: Precision) -> 'Fuzidate':
+        if self.__offset:
+            raise NotImplementedError
         self.check_valid()
 
         if precision is Precision.none:
@@ -193,14 +214,14 @@ class Fuzidate:
         return cls(date_to_number(date))
 
     @classmethod
-    def compose(cls, year=0, month=0, day=0):
+    def compose(cls, year=0, month=0, day=0, offset=0):
         if year < 0:
             raise ValueError('Year may not be < 0')
         if month < 0:
             raise ValueError('Month may not be < 0')
         if day < 0:
             raise ValueError('Day may not be < 0')
-        return cls(day + (month * 100) + (year * 10000))
+        return cls(day + (month * 100) + (year * 10000), offset)
 
     def __eq__(self, other) -> bool:
         if type(self) is not type(other):

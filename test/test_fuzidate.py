@@ -166,6 +166,36 @@ class TestProperties:
             def test_day():
                 assert OUTBREAK_FZD.high == datetime.date(1914, 7, 28)
 
+            @staticmethod
+            def test_year_offset():
+                year = fzd.Fuzidate.compose(1914, offset=5)
+                assert year.high == datetime.date(1919, 12, 31)
+
+            @staticmethod
+            def test_month_offset():
+                year = fzd.Fuzidate.compose(1914, 7, offset=5 + 12 + 2)
+                assert year.high == datetime.date(1916, 2, 29)
+
+            @staticmethod
+            def test_month_leap_year_offset():
+                year = fzd.Fuzidate.compose(1914, 7, offset=5 + (12 * 3) + 2)
+                assert year.high == datetime.date(1918, 2, 28)
+
+            @staticmethod
+            def test_month_offset_december():
+                month = fzd.Fuzidate.compose(1914, 7, offset=17)
+                assert month.high == datetime.date(1915, 12, 31)
+
+            @staticmethod
+            def test_month_offset_january():
+                month = fzd.Fuzidate.compose(1914, 7, offset=18)
+                assert month.high == datetime.date(1916, 1, 31)
+
+            @staticmethod
+            def test_day_offset():
+                assert fzd.Fuzidate.compose(1914, 7, 28, 25).high == (
+                    datetime.date(1914, 8, 22))
+
         class TestLow:
 
             @staticmethod
@@ -270,6 +300,11 @@ class TestCompose:
         assert fzd.Fuzidate.compose(1914, 7, 28) == fzd.Fuzidate(19140728)
 
     @staticmethod
+    def test_with_offset():
+        assert fzd.Fuzidate.compose(1914, 7, 28, 20) == fzd.Fuzidate(
+            19140728, 20)
+
+    @staticmethod
     def test_year_lt_0():
         with pytest.raises(ValueError, match='Year may not be < 0'):
             fzd.Fuzidate.compose(-1, 7, 28)
@@ -298,11 +333,6 @@ class TestCheckValid:
         with pytest.raises(fzd.InvalidFuzidateError,
                            match='Offset must not be negative'):
             fzd.Fuzidate(19140728, -1).check_valid()
-
-    @staticmethod
-    def test_offset_not_implemented():
-        with pytest.raises(NotImplementedError):
-            fzd.Fuzidate(19140728, 1).check_valid()
 
     @staticmethod
     def test_day_set():
@@ -344,8 +374,35 @@ class TestCheckValid:
                            match='Invalid year: 10000'):
             invalid.check_valid()
 
+    @staticmethod
+    def test_invalid_year_by_offset():
+        invalid = fzd.Fuzidate.compose(datetime.date.max.year, offset=1)
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Offset out of range'):
+            invalid.check_valid()
+
+    @staticmethod
+    def test_invalid_month_by_offset():
+        invalid = fzd.Fuzidate.compose(datetime.date.max.year, 12, offset=1)
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Offset out of range'):
+            invalid.check_valid()
+
+    @staticmethod
+    def test_invalid_day_by_offset():
+        invalid = fzd.Fuzidate.compose(datetime.date.max.year, 12, 31,
+                                       offset=1)
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Offset out of range'):
+            invalid.check_valid()
+
 
 class TestUsingPrecision:
+
+    @staticmethod
+    def test_offset_not_supported():
+        with pytest.raises(NotImplementedError):
+            fzd.Fuzidate(19140728, 1).using(fzd.Precision.month)
 
     @staticmethod
     def test_invalid_date():
