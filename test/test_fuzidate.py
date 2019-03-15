@@ -226,7 +226,7 @@ class TestToString:
     class TestStr:
 
         def test_unknown(self):
-            assert str(fzd.Fuzidate.unknown) == 'unknown'
+            assert str(fzd.Fuzidate.unknown) == '0'
 
         def test_year(self):
             assert str(fzd.Fuzidate(19140000)) == '1914'
@@ -237,6 +237,22 @@ class TestToString:
 
         def test_day(self):
             assert str(fzd.Fuzidate(19140701)) == '1914-07-01'
+
+        def test_invalid_unknown(self):
+            assert str(fzd.Fuzidate(0, offset=2)) == '0+2'
+
+        def test_year_offset(self):
+            assert str(fzd.Fuzidate(19140000, 2)) == '1914+2'
+            assert str(fzd.Fuzidate(100000, 3)) == '10+3'
+
+        def test_month_offset(self):
+            assert str(fzd.Fuzidate(19140700, 2)) == '1914-07+2'
+
+        def test_day_offset(self):
+            assert str(fzd.Fuzidate(19140701, 2)) == '1914-07-01+2'
+
+        def test_invalid_missing_year(self):
+            assert str(fzd.Fuzidate(701, 2)) == '0-07-01+2'
 
 
 class TestFuzidateOrder:

@@ -235,14 +235,29 @@ class Fuzidate:
 
     def __str__(self):
         precision = self.precision
-        if precision is Precision.none:
-            return 'unknown'
-        elif precision is Precision.year:
-            return str(self.year)
-        elif precision is Precision.month:
-            return '{}-{:02d}'.format(self.year, self.month)
+        offset = self.offset
+
+        year, month, day = self.year, self.month, self.day
+
+        if not (year or month or day):
+            if offset:
+                return '0+' + str(offset)
+            else:
+                return '0'
+
+        if offset:
+            offset_str = '+{:d}'.format(offset)
         else:
-            return '{}-{:02d}-{:02d}'.format(self.year, self.month, self.day)
+            offset_str = ''
+
+        if not (month or day):
+            return '{}{}'.format(year, offset_str)
+        elif not day and year:
+            return '{}-{:02d}{}'.format(self.year, self.month, offset_str)
+        else:
+            return '{}-{:02d}-{:02d}{}'.format(self.year, self.month, self.day,
+                                               offset_str)
+
 
     def __repr__(self):
         return '{}({})'.format(type(self).__name__, self.__number)
