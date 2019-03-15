@@ -21,10 +21,6 @@ OUTBREAK = datetime.date(1914, 7, 28)
 OUTBREAK_FZD = fzd.Fuzidate(19140728)
 
 
-def test_date_to_number():
-    assert fzd.date_to_number(OUTBREAK) == 19140728
-
-
 def test_from_date():
     assert fzd.Fuzidate.from_date(OUTBREAK).number == 19140728
 
