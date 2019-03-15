@@ -52,6 +52,10 @@ class Fuzidate:
         return self.__number
 
     @property
+    def offset(self) -> int:
+        return self.__offset
+
+    @property
     def year(self) -> int:
         return math.floor(self.__number / 10000)
 
@@ -122,15 +126,26 @@ class Fuzidate:
     def range(self) -> typing.Tuple[datetime.date, datetime.date]:
         return self.low, self.high
 
-    def __init__(self, number: int):
+    def __init__(self, number: int, offset: int=0):
         self.__number = number
+        self.__offset = offset
 
     def check_valid(self):
         if self.__validated:
             return
+
         if not self.__number:
+            if self.__offset:
+                raise InvalidFuzidateError(
+                    'Unknown fuzidate may not have offset')
             self.__validated = True
             return
+
+        if self.__offset < 0:
+            raise InvalidFuzidateError('Offset must not be negative')
+
+        if self.__offset:
+            raise NotImplementedError
 
         day = self.day
         # Check basic number construction.

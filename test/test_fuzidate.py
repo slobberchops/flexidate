@@ -72,6 +72,11 @@ class TestProperties:
         assert OUTBREAK_FZD.number == 19140728
 
     @staticmethod
+    def test_offset():
+        assert OUTBREAK_FZD.offset == 0
+        assert fzd.Fuzidate(19140000, 2).offset == 2
+
+    @staticmethod
     def test_year():
         assert OUTBREAK_FZD.year == 1914
 
@@ -281,6 +286,23 @@ class TestCompose:
 
 
 class TestCheckValid:
+
+    @staticmethod
+    def test_offset_on_unknown():
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Unknown fuzidate may not have offset'):
+            fzd.Fuzidate(0, 1).check_valid()
+
+    @staticmethod
+    def test_negative_offset():
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Offset must not be negative'):
+            fzd.Fuzidate(19140728, -1).check_valid()
+
+    @staticmethod
+    def test_offset_not_implemented():
+        with pytest.raises(NotImplementedError):
+            fzd.Fuzidate(19140728, 1).check_valid()
 
     @staticmethod
     def test_day_set():
