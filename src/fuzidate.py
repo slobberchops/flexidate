@@ -17,6 +17,7 @@ import datetime
 import enum
 import functools
 import math
+import re
 import typing
 
 
@@ -214,7 +215,7 @@ class Fuzidate:
         return cls(date_to_number(date))
 
     @classmethod
-    def compose(cls, year=0, month=0, day=0, offset=0):
+    def compose(cls, year: int=0, month: int=0, day: int=0, offset: int=0):
         if year < 0:
             raise ValueError('Year may not be < 0')
         if month < 0:
@@ -222,6 +223,17 @@ class Fuzidate:
         if day < 0:
             raise ValueError('Day may not be < 0')
         return cls(day + (month * 100) + (year * 10000), offset)
+
+    @classmethod
+    def parse(cls, s: str):
+        match = re.match(r'^(\d+)(?:-(\d+)(?:-(\d+))?)?(\+\d+)?$', s)
+        if match:
+            year, month, day, offset = match.groups()
+        else:
+            raise ValueError('Fuzidate parse error')
+
+        return cls.compose(int(year or 0), int(month or 0), int(day or 0),
+                           int(offset or 0))
 
     def __eq__(self, other) -> bool:
         if type(self) is not type(other):
@@ -234,7 +246,6 @@ class Fuzidate:
         return self.__number < other.__number
 
     def __str__(self):
-        precision = self.precision
         offset = self.offset
 
         year, month, day = self.year, self.month, self.day
@@ -257,7 +268,6 @@ class Fuzidate:
         else:
             return '{}-{:02d}-{:02d}{}'.format(self.year, self.month, self.day,
                                                offset_str)
-
 
     def __repr__(self):
         return '{}({})'.format(type(self).__name__, self.__number)

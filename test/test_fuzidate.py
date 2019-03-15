@@ -255,6 +255,46 @@ class TestToString:
             assert str(fzd.Fuzidate(701, 2)) == '0-07-01+2'
 
 
+class TestParse:
+
+    @staticmethod
+    def test_parse_year():
+        assert fzd.Fuzidate.parse('1914') == fzd.Fuzidate(19140000)
+
+    @staticmethod
+    def test_parse_month():
+        assert fzd.Fuzidate.parse('1914-7') == fzd.Fuzidate(19140700)
+
+    @staticmethod
+    def test_parse_padded_month():
+        assert fzd.Fuzidate.parse('1914-07') == fzd.Fuzidate(19140700)
+
+    @staticmethod
+    def test_parse_day():
+        assert fzd.Fuzidate.parse('1914-07-28') == fzd.Fuzidate(19140728)
+
+    @staticmethod
+    def test_parse_padded_day():
+        assert fzd.Fuzidate.parse('1914-07-028') == fzd.Fuzidate(19140728)
+
+    @staticmethod
+    def test_parse_year_offset():
+        assert fzd.Fuzidate.parse('1914+2') == fzd.Fuzidate(19140000, 2)
+
+    @staticmethod
+    def test_parse_month_offset():
+        assert fzd.Fuzidate.parse('1914-7+2') == fzd.Fuzidate(19140700, 2)
+
+    @staticmethod
+    def test_parse_day_offset():
+        assert fzd.Fuzidate.parse('1914-07-28+2') == fzd.Fuzidate(19140728, 2)
+
+    @staticmethod
+    def test_parse_invalid():
+        with pytest.raises(ValueError, match=r'Fuzidate parse error'):
+            fzd.Fuzidate.parse('invalid')
+
+
 class TestFuzidateOrder:
 
     class TestEq:
