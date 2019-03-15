@@ -212,7 +212,7 @@ class Fuzidate:
 
     @classmethod
     def from_date(cls, date: datetime.date) -> 'Fuzidate':
-        return cls(date_to_number(date))
+        return cls(date.day + date.month * 100 + date.year * 10000)
 
     @classmethod
     def compose(cls, year: int=0, month: int=0, day: int=0, offset: int=0):
@@ -273,27 +273,12 @@ class Fuzidate:
         return '{}({})'.format(type(self).__name__, self.__number)
 
 
-def date_to_number(date: datetime.date) -> Fuzidate:
-    """
-    Convert date to fuzidate number representation.
-
-    Args:
-        date: A date.
-
-    Returns:
-        Number Representation of date as an int number. For example,
-        Nov 11th 1918 is represented as 19181111.
-    """
-    return date.day + date.month * 100 + date.year * 10000
-
-
 Fuzidate.max = Fuzidate.from_date(datetime.date.max)
 Fuzidate.min = Fuzidate(datetime.date.min.year * 10000)
 Fuzidate.unknown = Fuzidate(0)
 
 
 __all__ = [
-    date_to_number.__name__,
     Fuzidate.__name__,
     InvalidFuzidateError.__name__,
     Precision.__name__,
