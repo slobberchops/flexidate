@@ -242,23 +242,6 @@ class Fuzidate:
 
         self.__validated = True
 
-    def using(self, precision: Precision) -> 'Fuzidate':
-        if self.__offset:
-            raise NotImplementedError
-        self.check_valid()
-
-        if precision is Precision.none:
-            return self.unknown
-        elif precision is Precision.year:
-            return self.compose(self.year or self.min.year)
-        elif precision is Precision.month:
-            return self.compose(self.year or self.min.year,
-                                self.month or 1)
-        else:
-            return self.compose(self.year or self.min.year,
-                                self.month or 1,
-                                self.day or 1)
-
     @classmethod
     def from_date(cls, date: datetime.date) -> 'Fuzidate':
         """Create precise fuzidate from exact date."""
