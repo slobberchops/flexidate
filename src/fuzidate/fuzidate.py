@@ -83,7 +83,7 @@ class Fuzidate:
         the understanding that integers with unknown dates are ordered before
         known dates. For example 19140700 naturally comes before 19140728.
         """
-        return self.__number
+        return (self.__year * 10000) + (self.__month * 100) + self.__day
 
     @property
     def offset(self) -> int:
@@ -93,17 +93,17 @@ class Fuzidate:
     @property
     def year(self) -> int:
         """Year if known, else 0."""
-        return math.floor(self.__number / 10000)
+        return self.__year
 
     @property
     def month(self) -> int:
         """Month if known, else 0."""
-        return (math.floor(self.__number / 100)) % 100
+        return self.__month
 
     @property
     def day(self) -> int:
         """Day if known, else 0."""
-        return self.__number % 100
+        return self.__day
 
     @property
     def is_valid(self) -> bool:
@@ -151,8 +151,10 @@ class Fuzidate:
         """Date range represented by this fuzidate."""
         return self.low, self.high
 
-    def __init__(self, number: int, offset: int=0):
-        self.__number = number
+    def __init__(self, year: int, month: int, day: int, offset: int = 0):
+        self.__year = year
+        self.__month = month
+        self.__day = day
         self.__offset = offset
 
     @staticmethod
@@ -200,7 +202,7 @@ class Fuzidate:
             return
 
         offset = self.__offset
-        if not self.__number:
+        if not (self.__year or self.__month or self.__day):
             if offset:
                 raise InvalidFuzidateError(
                     'Unknown fuzidate may not have offset')
@@ -218,12 +220,16 @@ class Fuzidate:
                 raise InvalidFuzidateError('Day must not be set')
 
         month = self.month
+        if month < 0:
+            raise InvalidFuzidateError('Month must not be negative')
         if precision < Precision.month:
             if month:
                 raise InvalidFuzidateError('Month must not be set')
 
         # Check that values are in correct range.
         year = self.year
+        if year < 0:
+            raise InvalidFuzidateError('Year must not be negative')
         if day:
             if day > calendar.monthrange(year, month)[1]:
                 raise InvalidFuzidateError('Invalid day: {}'.format(day))
@@ -235,6 +241,9 @@ class Fuzidate:
         if not (self.min.year <= year <= self.max.year):
             raise InvalidFuzidateError('Invalid year: {}'.format(year))
 
+        if day < 0:
+            raise InvalidFuzidateError('Day must not be negative')
+
         if offset < 0:
             raise InvalidFuzidateError('Offset must not be negative')
 
@@ -245,23 +254,24 @@ class Fuzidate:
     @classmethod
     def from_date(cls, date: datetime.date) -> 'Fuzidate':
         """Create precise fuzidate from exact date."""
-        return cls(date.day + date.month * 100 + date.year * 10000)
+        return cls(date.year, date.month, date.day)
 
     @classmethod
     def from_int(cls, i: int, offset: int=0):
         """Create fuzidate from integer value and optional offset."""
-        return cls(i, offset)
+        year = math.floor(i / 10000)
+        month = (math.floor(i / 100)) % 100
+        day = i % 100
+        return cls(year, month, day, offset)
 
     @classmethod
-    def compose(cls, year: int=0, month: int=0, day: int=0, offset: int=0):
+    def compose(cls,
+                year: int = 0,
+                month: int = 0,
+                day: int = 0,
+                offset: int = 0):
         """Compose fuzidate from component values."""
-        if year < 0:
-            raise ValueError('Year may not be < 0')
-        if month < 0:
-            raise ValueError('Month may not be < 0')
-        if day < 0:
-            raise ValueError('Day may not be < 0')
-        return cls(day + (month * 100) + (year * 10000), offset)
+        return cls(year, month, day, offset)
 
     @classmethod
     def parse(cls, s: str):
@@ -272,22 +282,25 @@ class Fuzidate:
         else:
             raise ValueError('Fuzidate parse error')
 
-        return cls.compose(int(year or 0), int(month or 0), int(day or 0),
-                           int(offset or 0))
+        return cls(int(year or 0), int(month or 0), int(day or 0),
+                   int(offset or 0))
 
     def __eq__(self, other) -> bool:
         if type(self) is not type(other):
             return NotImplemented
-        return self.__number == other.__number
+        return (self.__year, self.__month, self.__day) == (
+            other.__year, other.__month, other.__day)
 
     def __lt__(self, other) -> bool:
         if type(self) is not type(other):
             return NotImplemented
-        return self.__number < other.__number
+        return (self.__year, self.__month, self.__day) < (
+            other.__year, other.__month, other.__day)
 
     def __bool__(self) -> bool:
         self.check_valid()
-        return bool(self.__number or self.__offset)
+        return bool(self.__year or self.__month or self.__day
+                    or self.__offset)
 
     def __str__(self) -> str:
         offset = self.offset
@@ -314,10 +327,10 @@ class Fuzidate:
                                                offset_str)
 
     def __repr__(self) -> str:
-        return '{}.from_int({})'.format(type(self).__name__, self.__number)
+        return '{}.from_int({})'.format(type(self).__name__, self.number)
 
     def __hash__(self) -> int:
-        return hash((self.__number, self.__offset))
+        return hash((self.__year, self.__month, self.__day, self.__offset))
 
 
 compose = Fuzidate.compose

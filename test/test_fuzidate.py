@@ -398,18 +398,15 @@ class TestCompose:
 
     @staticmethod
     def test_year_lt_0():
-        with pytest.raises(ValueError, match='Year may not be < 0'):
-            fzd.Fuzidate.compose(-1, 7, 28)
+        fzd.Fuzidate.compose(-1, 7, 28)
 
     @staticmethod
     def test_month_lt_0():
-        with pytest.raises(ValueError, match='Month may not be < 0'):
-            fzd.Fuzidate.compose(1914, -1, 28)
+        fzd.Fuzidate.compose(1914, -1, 28)
 
     @staticmethod
     def test_day_lt_0():
-        with pytest.raises(ValueError, match='Day may not be < 0'):
-            fzd.Fuzidate.compose(1914, 7, -1)
+        fzd.Fuzidate.compose(1914, 7, -1)
 
 
 class TestCheckValid:
@@ -419,6 +416,24 @@ class TestCheckValid:
         with pytest.raises(fzd.InvalidFuzidateError,
                            match='Unknown fuzidate may not have offset'):
             fzd.Fuzidate.from_int(0, 1).check_valid()
+
+    @staticmethod
+    def test_negative_year():
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Year must not be negative'):
+            fzd.Fuzidate.compose(-1, 7, 28).check_valid()
+
+    @staticmethod
+    def test_negative_month():
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Month must not be negative'):
+            fzd.Fuzidate.compose(1914, -1, 28).check_valid()
+
+    @staticmethod
+    def test_negative_day():
+        with pytest.raises(fzd.InvalidFuzidateError,
+                           match='Day must not be negative'):
+            fzd.Fuzidate.compose(1914, 7, -1).check_valid()
 
     @staticmethod
     def test_negative_offset():
