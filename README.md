@@ -115,7 +115,7 @@ To create a fuzidate from its component parts:
 To create a fuzidate from a Python date:
 `Fuzidate.from_date(date(1914, 8, 28))`
 
-To create a fuzidate from a string: `Fuzidate.parse('1914-7+2'')`
+To create a fuzidate from a string: `Fuzidate.parse('1914-7+2')`
 
 ## Range
 
@@ -125,6 +125,6 @@ A Python `date` range can be constructed from a valid fuzidate using:
 It is also possible to extract the low value and high value individually
 as `fzd.low` and `fzd.high` respectively. For example, using fuzidate
 `Fuzidate.compose(1914, 7, offset=2)`:
-* `fzd.low` is `date(1914, 7, 1)`.
-* `fzd.high` is `date(1914, 9, 30)`.
+* `fzd.low` becomes `date(1914, 7, 1)`.
+* `fzd.high` becomes `date(1914, 9, 30)`.
 
