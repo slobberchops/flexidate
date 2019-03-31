@@ -21,7 +21,7 @@ import re
 import typing
 
 
-class InvalidFuzidateError(Exception):
+class InvalidFuzidateError(ValueError):
     """Raised when fuzidate is invalid."""
 
 
