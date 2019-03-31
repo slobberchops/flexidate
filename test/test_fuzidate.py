@@ -217,41 +217,67 @@ class TestProperties:
                 assert OUTBREAK_FZD.low == datetime.date(1914, 7, 28)
 
 
+class TestBool:
+
+    @staticmethod
+    def test_true():
+        assert OUTBREAK_FZD
+
+    @staticmethod
+    def test_false():
+        assert not fzd.Fuzidate.unknown
+
+    @staticmethod
+    def test_invalid():
+        with pytest.raises(fzd.InvalidFuzidateError):
+            bool(fzd.Fuzidate(0, offset=1))
+
+
 class TestToString:
 
-    def test_repr(self):
+    @staticmethod
+    def test_repr():
         assert repr(fzd.Fuzidate.unknown) == 'Fuzidate(0)'
         assert repr(OUTBREAK_FZD) == 'Fuzidate(19140728)'
 
     class TestStr:
 
-        def test_unknown(self):
+        @staticmethod
+        def test_unknown():
             assert str(fzd.Fuzidate.unknown) == '0'
 
-        def test_year(self):
+        @staticmethod
+        def test_year():
             assert str(fzd.Fuzidate(19140000)) == '1914'
             assert str(fzd.Fuzidate(100000)) == '10'
 
-        def test_month(self):
+        @staticmethod
+        def test_month():
             assert str(fzd.Fuzidate(19140700)) == '1914-07'
 
-        def test_day(self):
+        @staticmethod
+        def test_day():
             assert str(fzd.Fuzidate(19140701)) == '1914-07-01'
 
-        def test_invalid_unknown(self):
+        @staticmethod
+        def test_invalid_unknown():
             assert str(fzd.Fuzidate(0, offset=2)) == '0+2'
 
-        def test_year_offset(self):
+        @staticmethod
+        def test_year_offset():
             assert str(fzd.Fuzidate(19140000, 2)) == '1914+2'
             assert str(fzd.Fuzidate(100000, 3)) == '10+3'
 
-        def test_month_offset(self):
+        @staticmethod
+        def test_month_offset():
             assert str(fzd.Fuzidate(19140700, 2)) == '1914-07+2'
 
-        def test_day_offset(self):
+        @staticmethod
+        def test_day_offset():
             assert str(fzd.Fuzidate(19140701, 2)) == '1914-07-01+2'
 
-        def test_invalid_missing_year(self):
+        @staticmethod
+        def test_invalid_missing_year():
             assert str(fzd.Fuzidate(701, 2)) == '0-07-01+2'
 
 

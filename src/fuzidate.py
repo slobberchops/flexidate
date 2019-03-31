@@ -27,6 +27,11 @@ class InvalidFuzidateError(Exception):
 
 @functools.total_ordering
 class Precision(enum.Enum):
+    """Levels of precision applied to fuzidate.
+
+    Precision has ordering. After all, month precision is more precise than
+    year precision.
+    """
     none = 1
     year = 2
     month = 3
@@ -40,6 +45,7 @@ class Precision(enum.Enum):
 
 @functools.total_ordering
 class Fuzidate:
+    """Main class representing an imprecise date."""
 
     max = None  # type: ClassVar[datetime.date]
     min = None  # type: ClassVar[datetime.date]
@@ -50,6 +56,15 @@ class Fuzidate:
 
     @property
     def number(self) -> int:
+        """Numeric representation of fuzidate.
+
+        Each date can be encoded as an integer. The dates are encoded by
+        shifting larger units into higher order digits. Specifically:
+
+            day: Lowest two decimal digits.
+            month: Middle two decimal digits.
+            year: highest decimal digit.
+        """
         return self.__number
 
     @property
@@ -245,7 +260,11 @@ class Fuzidate:
             return NotImplemented
         return self.__number < other.__number
 
-    def __str__(self):
+    def __bool__(self) -> bool:
+        self.check_valid()
+        return bool(self.__number or self.__offset)
+
+    def __str__(self) -> str:
         offset = self.offset
 
         year, month, day = self.year, self.month, self.day
@@ -269,10 +288,10 @@ class Fuzidate:
             return '{}-{:02d}-{:02d}{}'.format(self.year, self.month, self.day,
                                                offset_str)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({})'.format(type(self).__name__, self.__number)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.__number, self.__offset))
 
 
