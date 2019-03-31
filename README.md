@@ -101,3 +101,30 @@ The unknown date is represented as `0`.
 Fuzidates are fully ordered. Less precise dates are ordered before more
 precise values. So, `1914-07` \< `1914-07-28`. Shorter ranges are ordered
 before greater ranges. So `1914-07+2` \< `1914-07+3`.
+
+# Usage
+
+## Construction
+
+Fuzidates are create in a few ways. The constructor takes an integer root
+date plus optional offset: `Fuzidate(19140700, 2)`
+
+To create a fuzidate from its component parts:
+`Fuzidate.compse(1914, 07, offset=2)`
+
+To create a fuzidate from a Python date:
+`Fuzidate.from_date(date(1914, 8, 28))`
+
+To create a fuzidate from a string: `Fuzidate.parse('1914-7+2'')`
+
+## Range
+
+A Python `date` range can be constructed from a valid fuzidate using:
+`fzd.range`. It returns a tuple (low, high) of type (date, date).
+
+It is also possible to extract the low value and high value individually
+as `fzd.low` and `fzd.high` respectively. For example, using fuzidate
+`Fuzidate.compose(1914, 7, offset=2)`:
+* `fzd.low` is `date(1914, 7, 1)`.
+* `fzd.high` is `date(1914, 9, 30)`.
+
