@@ -106,11 +106,12 @@ before greater ranges. So `1914-07+2` \< `1914-07+3`.
 
 ## Construction
 
-Fuzidates are create in a few ways. The constructor takes an integer root
-date plus optional offset: `Fuzidate(19140700, 2)`
+Fuzidates are create in a few ways. In general, avoid using the constructor.
+
+To create a fuzidate from integers: `Fuzidate.from_int(19140700, 2)`
 
 To create a fuzidate from its component parts:
-`Fuzidate.compse(1914, 07, offset=2)`
+`Fuzidate.compose(1914, 07, offset=2)`
 
 To create a fuzidate from a Python date:
 `Fuzidate.from_date(date(1914, 8, 28))`

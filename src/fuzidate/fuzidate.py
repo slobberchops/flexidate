@@ -248,6 +248,11 @@ class Fuzidate:
         return cls(date.day + date.month * 100 + date.year * 10000)
 
     @classmethod
+    def from_int(cls, i: int, offset: int=0):
+        """Create fuzidate from integer value and optional offset."""
+        return cls(i, offset)
+
+    @classmethod
     def compose(cls, year: int=0, month: int=0, day: int=0, offset: int=0):
         """Compose fuzidate from component values."""
         if year < 0:
@@ -309,15 +314,15 @@ class Fuzidate:
                                                offset_str)
 
     def __repr__(self) -> str:
-        return '{}({})'.format(type(self).__name__, self.__number)
+        return '{}.from_int({})'.format(type(self).__name__, self.__number)
 
     def __hash__(self) -> int:
         return hash((self.__number, self.__offset))
 
 
 Fuzidate.max = Fuzidate.from_date(datetime.date.max)
-Fuzidate.min = Fuzidate(datetime.date.min.year * 10000)
-Fuzidate.unknown = Fuzidate(0)
+Fuzidate.min = Fuzidate.from_int(datetime.date.min.year * 10000)
+Fuzidate.unknown = Fuzidate.from_int(0)
 
 
 __all__ = [

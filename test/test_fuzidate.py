@@ -19,7 +19,7 @@ import pytest
 import fuzidate as fzd
 
 OUTBREAK = datetime.date(1914, 7, 28)
-OUTBREAK_FZD = fzd.Fuzidate(19140728)
+OUTBREAK_FZD = fzd.Fuzidate.from_int(19140728)
 
 
 def test_from_date():
@@ -75,7 +75,7 @@ class TestProperties:
     @staticmethod
     def test_offset():
         assert OUTBREAK_FZD.offset == 0
-        assert fzd.Fuzidate(19140000, 2).offset == 2
+        assert fzd.Fuzidate.from_int(19140000, 2).offset == 2
 
     @staticmethod
     def test_year():
@@ -91,7 +91,7 @@ class TestProperties:
 
     @staticmethod
     def test_month_missing():
-        assert fzd.Fuzidate(19140000).month == 0
+        assert fzd.Fuzidate.from_int(19140000).month == 0
 
     @staticmethod
     def test_day():
@@ -99,7 +99,7 @@ class TestProperties:
 
     @staticmethod
     def test_day_missing():
-        assert fzd.Fuzidate(19140700).day == 0
+        assert fzd.Fuzidate.from_int(19140700).day == 0
 
     class TestPrecision:
 
@@ -109,15 +109,18 @@ class TestProperties:
 
         @staticmethod
         def test_year():
-            assert fzd.Fuzidate(19180000).precision is fzd.Precision.year
+            assert (fzd.Fuzidate.from_int(19180000).precision
+                    is fzd.Precision.year)
 
         @staticmethod
         def test_month():
-            assert fzd.Fuzidate(19180700).precision is fzd.Precision.month
+            assert (fzd.Fuzidate.from_int(19180700).precision
+                    is fzd.Precision.month)
 
         @staticmethod
         def test_day():
-            assert fzd.Fuzidate(19180728).precision is fzd.Precision.day
+            assert (fzd.Fuzidate.from_int(19180728).precision
+                    is fzd.Precision.day)
 
     class TestIsValid:
 
@@ -127,14 +130,14 @@ class TestProperties:
 
         @staticmethod
         def test_false():
-            assert not fzd.Fuzidate(1).is_valid
+            assert not fzd.Fuzidate.from_int(1).is_valid
 
     class TestRanges:
 
         @staticmethod
         @pytest.mark.parametrize('prop', ['high', 'low', 'range'])
         def test_invalid(prop):
-            invalid = fzd.Fuzidate(1)
+            invalid = fzd.Fuzidate.from_int(1)
             with pytest.raises(fzd.InvalidFuzidateError):
                 getattr(invalid, prop)
 
@@ -231,15 +234,15 @@ class TestBool:
     @staticmethod
     def test_invalid():
         with pytest.raises(fzd.InvalidFuzidateError):
-            bool(fzd.Fuzidate(0, offset=1))
+            bool(fzd.Fuzidate.from_int(0, offset=1))
 
 
 class TestToString:
 
     @staticmethod
     def test_repr():
-        assert repr(fzd.Fuzidate.unknown) == 'Fuzidate(0)'
-        assert repr(OUTBREAK_FZD) == 'Fuzidate(19140728)'
+        assert repr(fzd.Fuzidate.unknown) == 'Fuzidate.from_int(0)'
+        assert repr(OUTBREAK_FZD) == 'Fuzidate.from_int(19140728)'
 
     class TestStr:
 
@@ -249,72 +252,77 @@ class TestToString:
 
         @staticmethod
         def test_year():
-            assert str(fzd.Fuzidate(19140000)) == '1914'
-            assert str(fzd.Fuzidate(100000)) == '10'
+            assert str(fzd.Fuzidate.from_int(19140000)) == '1914'
+            assert str(fzd.Fuzidate.from_int(100000)) == '10'
 
         @staticmethod
         def test_month():
-            assert str(fzd.Fuzidate(19140700)) == '1914-07'
+            assert str(fzd.Fuzidate.from_int(19140700)) == '1914-07'
 
         @staticmethod
         def test_day():
-            assert str(fzd.Fuzidate(19140701)) == '1914-07-01'
+            assert str(fzd.Fuzidate.from_int(19140701)) == '1914-07-01'
 
         @staticmethod
         def test_invalid_unknown():
-            assert str(fzd.Fuzidate(0, offset=2)) == '0+2'
+            assert str(fzd.Fuzidate.from_int(0, offset=2)) == '0+2'
 
         @staticmethod
         def test_year_offset():
-            assert str(fzd.Fuzidate(19140000, 2)) == '1914+2'
-            assert str(fzd.Fuzidate(100000, 3)) == '10+3'
+            assert str(fzd.Fuzidate.from_int(19140000, 2)) == '1914+2'
+            assert str(fzd.Fuzidate.from_int(100000, 3)) == '10+3'
 
         @staticmethod
         def test_month_offset():
-            assert str(fzd.Fuzidate(19140700, 2)) == '1914-07+2'
+            assert str(fzd.Fuzidate.from_int(19140700, 2)) == '1914-07+2'
 
         @staticmethod
         def test_day_offset():
-            assert str(fzd.Fuzidate(19140701, 2)) == '1914-07-01+2'
+            assert str(fzd.Fuzidate.from_int(19140701, 2)) == '1914-07-01+2'
 
         @staticmethod
         def test_invalid_missing_year():
-            assert str(fzd.Fuzidate(701, 2)) == '0-07-01+2'
+            assert str(fzd.Fuzidate.from_int(701, 2)) == '0-07-01+2'
 
 
 class TestParse:
 
     @staticmethod
     def test_parse_year():
-        assert fzd.Fuzidate.parse('1914') == fzd.Fuzidate(19140000)
+        assert fzd.Fuzidate.parse('1914') == fzd.Fuzidate.from_int(19140000)
 
     @staticmethod
     def test_parse_month():
-        assert fzd.Fuzidate.parse('1914-7') == fzd.Fuzidate(19140700)
+        assert fzd.Fuzidate.parse('1914-7') == fzd.Fuzidate.from_int(19140700)
 
     @staticmethod
     def test_parse_padded_month():
-        assert fzd.Fuzidate.parse('1914-07') == fzd.Fuzidate(19140700)
+        assert fzd.Fuzidate.parse('1914-07') == fzd.Fuzidate.from_int(19140700)
 
     @staticmethod
     def test_parse_day():
-        assert fzd.Fuzidate.parse('1914-07-28') == fzd.Fuzidate(19140728)
+        assert (fzd.Fuzidate.parse('1914-07-28')
+                == fzd.Fuzidate.from_int(19140728))
 
     @staticmethod
     def test_parse_padded_day():
-        assert fzd.Fuzidate.parse('1914-07-028') == fzd.Fuzidate(19140728)
+        assert (fzd.Fuzidate.parse('1914-07-028')
+                == fzd.Fuzidate.from_int(19140728))
 
     @staticmethod
     def test_parse_year_offset():
-        assert fzd.Fuzidate.parse('1914+2') == fzd.Fuzidate(19140000, 2)
+        assert (fzd.Fuzidate.parse('1914+2')
+                == fzd.Fuzidate.from_int(19140000, 2))
 
     @staticmethod
     def test_parse_month_offset():
-        assert fzd.Fuzidate.parse('1914-7+2') == fzd.Fuzidate(19140700, 2)
+        assert (fzd.Fuzidate.parse('1914-7+2')
+                == fzd.Fuzidate.from_int(19140700, 2))
 
     @staticmethod
     def test_parse_day_offset():
-        assert fzd.Fuzidate.parse('1914-07-28+2') == fzd.Fuzidate(19140728, 2)
+        assert (fzd.Fuzidate.parse('1914-07-28+2')
+                == fzd.Fuzidate.from_int(19140728, 2))
 
     @staticmethod
     def test_parse_invalid():
@@ -337,12 +345,12 @@ class TestFuzidateOrder:
 
         @staticmethod
         def test_is_eq():
-            assert OUTBREAK_FZD == fzd.Fuzidate(19140728)
+            assert OUTBREAK_FZD == fzd.Fuzidate.from_int(19140728)
 
         @staticmethod
         @pytest.mark.parametrize('number', [19181111, 19140700, 19140000, 0])
         def test_is_ne(number):
-            assert OUTBREAK_FZD != fzd.Fuzidate(number)
+            assert OUTBREAK_FZD != fzd.Fuzidate.from_int(number)
 
     class TestLt:
 
@@ -356,12 +364,12 @@ class TestFuzidateOrder:
         @staticmethod
         @pytest.mark.parametrize('number', [19140729, 19140800, 19150000])
         def test_is_lt(number):
-            assert OUTBREAK_FZD < fzd.Fuzidate(number)
+            assert OUTBREAK_FZD < fzd.Fuzidate.from_int(number)
 
         @staticmethod
         @pytest.mark.parametrize('number', [19140727, 19140700, 19140000])
         def test_is_ge(number):
-            assert OUTBREAK_FZD >= fzd.Fuzidate(number)
+            assert OUTBREAK_FZD >= fzd.Fuzidate.from_int(number)
 
 
 class TestCompose:
@@ -372,19 +380,20 @@ class TestCompose:
 
     @staticmethod
     def test_year():
-        assert fzd.Fuzidate.compose(1914) == fzd.Fuzidate(19140000)
+        assert fzd.Fuzidate.compose(1914) == fzd.Fuzidate.from_int(19140000)
 
     @staticmethod
     def test_month():
-        assert fzd.Fuzidate.compose(1914, 7) == fzd.Fuzidate(19140700)
+        assert fzd.Fuzidate.compose(1914, 7) == fzd.Fuzidate.from_int(19140700)
 
     @staticmethod
     def test_day():
-        assert fzd.Fuzidate.compose(1914, 7, 28) == fzd.Fuzidate(19140728)
+        assert fzd.Fuzidate.compose(1914, 7, 28) == fzd.Fuzidate.from_int(
+            19140728)
 
     @staticmethod
     def test_with_offset():
-        assert fzd.Fuzidate.compose(1914, 7, 28, 20) == fzd.Fuzidate(
+        assert fzd.Fuzidate.compose(1914, 7, 28, 20) == fzd.Fuzidate.from_int(
             19140728, 20)
 
     @staticmethod
@@ -409,25 +418,25 @@ class TestCheckValid:
     def test_offset_on_unknown():
         with pytest.raises(fzd.InvalidFuzidateError,
                            match='Unknown fuzidate may not have offset'):
-            fzd.Fuzidate(0, 1).check_valid()
+            fzd.Fuzidate.from_int(0, 1).check_valid()
 
     @staticmethod
     def test_negative_offset():
         with pytest.raises(fzd.InvalidFuzidateError,
                            match='Offset must not be negative'):
-            fzd.Fuzidate(19140728, -1).check_valid()
+            fzd.Fuzidate.from_int(19140728, -1).check_valid()
 
     @staticmethod
     def test_day_set():
         with pytest.raises(fzd.InvalidFuzidateError,
                            match='Day must not be set'):
-            fzd.Fuzidate(19180001).check_valid()
+            fzd.Fuzidate.from_int(19180001).check_valid()
 
     @staticmethod
     def test_month_set():
         with pytest.raises(fzd.InvalidFuzidateError,
                            match='Month must not be set'):
-            fzd.Fuzidate(100).check_valid()
+            fzd.Fuzidate.from_int(100).check_valid()
 
     @staticmethod
     def test_invalid_day():
