@@ -151,11 +151,14 @@ class Fuzidate:
         """Date range represented by this fuzidate."""
         return self.low, self.high
 
-    def __init__(self, year: int, month: int, day: int, offset: int = 0):
+    def __init__(self, year: int, month: int, day: int, offset: int = 0, *,
+                 validate: bool = True):
         self.__year = year
         self.__month = month
         self.__day = day
         self.__offset = offset
+        if validate:
+            self.check_valid()
 
     @staticmethod
     def __calc_high(precision, year, month, day, offset):
@@ -254,27 +257,29 @@ class Fuzidate:
     @classmethod
     def from_date(cls, date: datetime.date) -> 'Fuzidate':
         """Create precise fuzidate from exact date."""
-        return cls(date.year, date.month, date.day)
+        return cls(date.year, date.month, date.day, validate=False)
 
     @classmethod
-    def from_int(cls, i: int, offset: int=0):
+    def from_int(cls, i: int, offset: int=0, *,
+                 validate: bool = True):
         """Create fuzidate from integer value and optional offset."""
         year = math.floor(i / 10000)
         month = (math.floor(i / 100)) % 100
         day = i % 100
-        return cls(year, month, day, offset)
+        return cls(year, month, day, offset, validate=validate)
 
     @classmethod
     def compose(cls,
                 year: int = 0,
                 month: int = 0,
                 day: int = 0,
-                offset: int = 0):
+                offset: int = 0,
+                validate: bool = True):
         """Compose fuzidate from component values."""
-        return cls(year, month, day, offset)
+        return cls(year, month, day, offset, validate=validate)
 
     @classmethod
-    def parse(cls, s: str):
+    def parse(cls, s: str, *, validate: bool = True):
         """Parse fuzidate from string."""
         match = re.match(r'^(\d+)(?:-(\d+)(?:-(\d+))?)?(\+\d+)?$', s)
         if match:
@@ -283,7 +288,7 @@ class Fuzidate:
             raise ValueError('Fuzidate parse error')
 
         return cls(int(year or 0), int(month or 0), int(day or 0),
-                   int(offset or 0))
+                   int(offset or 0), validate=validate)
 
     def __eq__(self, other) -> bool:
         if type(self) is not type(other):
@@ -339,8 +344,8 @@ from_int = Fuzidate.from_int
 parse = Fuzidate.parse
 
 Fuzidate.max = from_date(datetime.date.max)
-Fuzidate.min = from_int(datetime.date.min.year * 10000)
-Fuzidate.unknown = from_int(0)
+Fuzidate.min = from_int(datetime.date.min.year * 10000, validate=False)
+Fuzidate.unknown = from_int(0, validate=False)
 
 
 __all__ = [

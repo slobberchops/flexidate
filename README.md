@@ -54,16 +54,9 @@ represented as `19140800`.
 
 # Invalid fuzidates
 
-This library allows for representation of invalid fuzidates. These are
-permitted because often data are not entered correctly when read from other
-sources and may need to undergo some cleaning steps (or elimination, depending
-on circumstances). This library allows for the preservation of these dates
-where possible. So, for example, if a date has a month of "17" instead of "7"
-it is possible to construct a fuzidate as such. However, when checked for
-validity before certain operations, this will cause an error.
-
-Many operations for fuzidate cause a validity check. These checks will raise
-`InvalidFuzidateError` when they fail.
+By default, the library does not permit the construction of invalid fuzidates.
+When an invalid construction is normally attempted the library will raise
+`InvalidFuzidateError'.
 
 A fuzidate is invalid when:
 * The year is \< 0.
@@ -77,6 +70,20 @@ but 1914-09-31 is not.
 example, a flexidate 1914-00-28 is invalid because it has a precise day
 even though the month is unknown.
 * Offset must be \>= 0.
+
+However, it is possible to explicitly override this behavior with the
+`validate` parameter on most construction functions.
+
+This library allows for representation of invalid fuzidatesm because often
+data are not entered correctly when read from other sources and may need to
+undergo some cleaning steps (or elimination, depending on circumstances). This
+library allows for the preservation of these dates where possible. So, for
+example, if a date has a month of "17" instead of "7" it is possible to
+construct a fuzidate as such. However, when checked for validity before
+certain operations, this will cause an error.
+
+Many operations for fuzidate cause a validity check. These checks will raise
+`InvalidFuzidateError` when they fail.
 
 # Fuzidate parsing
 
