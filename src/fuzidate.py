@@ -64,27 +64,53 @@ class Fuzidate:
             day: Lowest two decimal digits.
             month: Middle two decimal digits.
             year: highest decimal digit.
+
+        So a date like July 28, 1914 can be represented as:
+
+            19140728
+
+        Dates that have unknown values, such as only the month being known
+        can represent the missing values with 0. For example July 1914 is:
+
+            19140700
+
+        It is not intended that these date values represent higher order
+        missing values. So for example, it is not expected to represent the
+        concept of only knowing a date as July 28 but not knowing the year.
+        A value such as 00000728 is not considered valid.
+
+        These integer values have the useful property of natural ordering with
+        the understanding that integers with unknown dates are ordered before
+        known dates. For example 19140700 naturally comes before 19140728.
         """
         return self.__number
 
     @property
     def offset(self) -> int:
+        """Offset of unknown value."""
         return self.__offset
 
     @property
     def year(self) -> int:
+        """Year if known, else 0."""
         return math.floor(self.__number / 10000)
 
     @property
     def month(self) -> int:
+        """Month if known, else 0."""
         return (math.floor(self.__number / 100)) % 100
 
     @property
     def day(self) -> int:
+        """Day if known, else 0."""
         return self.__number % 100
 
     @property
     def is_valid(self) -> bool:
+        """Determine if fuzidate is valid.
+
+        True if valid, else False.
+        """
         try:
             self.check_valid()
         except InvalidFuzidateError:
@@ -94,6 +120,7 @@ class Fuzidate:
 
     @property
     def precision(self) -> Precision:
+        """Known precision of fuzidate."""
         if not self.year:
             return Precision.none
         elif not self.month:
@@ -105,11 +132,13 @@ class Fuzidate:
 
     @property
     def high(self) -> datetime.date:
+        """Upper bound date."""
         self.check_valid()
         return self.__high
 
     @property
     def low(self) -> datetime.date:
+        """Lower bound date."""
         if not self.__low:
             self.check_valid()
             self.__low = datetime.date(self.year or datetime.date.min.year,
@@ -119,6 +148,7 @@ class Fuzidate:
 
     @property
     def range(self) -> typing.Tuple[datetime.date, datetime.date]:
+        """Date range represented by this fuzidate."""
         return self.low, self.high
 
     def __init__(self, number: int, offset: int=0):
@@ -162,6 +192,10 @@ class Fuzidate:
             raise InvalidFuzidateError('Offset out of range') from None
 
     def check_valid(self):
+        """Check if fuzidate is valid.
+
+        Raises InvalidFuzidate if not valid, else does nothing.
+        """
         if self.__validated:
             return
 
@@ -227,10 +261,12 @@ class Fuzidate:
 
     @classmethod
     def from_date(cls, date: datetime.date) -> 'Fuzidate':
+        """Create precise fuzidate from exact date."""
         return cls(date.day + date.month * 100 + date.year * 10000)
 
     @classmethod
     def compose(cls, year: int=0, month: int=0, day: int=0, offset: int=0):
+        """Compose fuzidate from component values."""
         if year < 0:
             raise ValueError('Year may not be < 0')
         if month < 0:
@@ -241,6 +277,7 @@ class Fuzidate:
 
     @classmethod
     def parse(cls, s: str):
+        """Parse fuzidate from string."""
         match = re.match(r'^(\d+)(?:-(\d+)(?:-(\d+))?)?(\+\d+)?$', s)
         if match:
             year, month, day, offset = match.groups()
