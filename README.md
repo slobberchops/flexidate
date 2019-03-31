@@ -118,6 +118,10 @@ To create a fuzidate from a Python date:
 
 To create a fuzidate from a string: `Fuzidate.parse('1914-7+2')`
 
+There are also aliases for these construction methods in the `fuzidate`
+module itself.  So `fuzidate.parse('1914-7')` is the same as
+`fuzidate.Fuzidate.parse('1914-7')`.
+
 ## Range
 
 A Python `date` range can be constructed from a valid fuzidate using:

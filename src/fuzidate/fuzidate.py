@@ -320,13 +320,22 @@ class Fuzidate:
         return hash((self.__number, self.__offset))
 
 
-Fuzidate.max = Fuzidate.from_date(datetime.date.max)
-Fuzidate.min = Fuzidate.from_int(datetime.date.min.year * 10000)
-Fuzidate.unknown = Fuzidate.from_int(0)
+compose = Fuzidate.compose
+from_date = Fuzidate.from_date
+from_int = Fuzidate.from_int
+parse = Fuzidate.parse
+
+Fuzidate.max = from_date(datetime.date.max)
+Fuzidate.min = from_int(datetime.date.min.year * 10000)
+Fuzidate.unknown = from_int(0)
 
 
 __all__ = [
     Fuzidate.__name__,
     InvalidFuzidateError.__name__,
     Precision.__name__,
+    Fuzidate.compose.__name__,
+    Fuzidate.from_date.__name__,
+    Fuzidate.from_int.__name__,
+    Fuzidate.parse.__name__,
 ]
