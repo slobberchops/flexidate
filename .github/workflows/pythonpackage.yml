@@ -25,7 +25,7 @@ jobs:
         python -m pip install pipenv
     - name: Install dependencies
       run: |
-        pipenv sync -d
+        pipenv sync -d --bare
     - name: Lint with flake8
       run: |
         pip install flake8
